@@ -11,7 +11,7 @@ class DellHost(ServerBase):
         self.manufacturer = "Dell"
 
     def is_blade(self):
-        return self.get_product_name().startswith("PowerEdge M")
+        return self.get_product_name().startswith("PowerEdge M") or self.is_c6320() or self.get_product_name().startswith("PowerEdge C6420")
 
     def get_blade_slot(self):
         """
@@ -23,9 +23,22 @@ class DellHost(ServerBase):
             return self.baseboard[0].get("Location In Chassis").strip()
         return None
 
+    def is_c6320(self):
+        """ Return true if the server is a C6320
+
+        C6320 have limited dmidecode information and it is not possible to get a serial for a chassis,
+        or the slot location.
+
+        Returns:
+            _type_: bool
+        """
+        return self.get_product_name().startswith("PowerEdge C6320")
+
     def get_chassis_name(self):
         if not self.is_blade():
             return None
+        if self.is_c6320():
+            return "Chassis {}".format(self.get_position())
         return "Chassis {}".format(self.get_service_tag())
 
     def get_chassis(self):
