@@ -90,6 +90,7 @@ class Ethtool:
     def parse_ethtool_mac_output(self):
         status, output = subprocess.getstatusoutput("ethtool -P {}".format(self.interface))
         if status == 0:
+#            match = re.search(r"[0-9a-f:]{58}", output)
             match = re.search(r"[0-9a-f:]{17}", output)
             if match and match.group(0) != "00:00:00:00:00:00":
                 return {"mac_address": match.group(0)}

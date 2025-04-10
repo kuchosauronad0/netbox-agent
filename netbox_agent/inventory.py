@@ -22,6 +22,13 @@ INVENTORY_TAG = {
     "raid_card": {"name": "hw:raid_card", "slug": "hw-raid-card"},
 }
 
+def strip_longest_00_colon(s):
+    matches = list(re.finditer(r"(00:)+", s))  # Find all occurrences of "00:" repeating
+    if matches:
+        longest_match = max(matches, key=lambda m: len(m.group()))  # Get the longest one
+        return s[:longest_match.start()] + "::" + s[longest_match.end():]  # Remove it
+    return s  # Return unchanged if no match
+
 
 class Inventory:
     """
@@ -157,8 +164,10 @@ class Inventory:
                     description="{}".format(motherboard.get("description")),
                 )
 
+
     def create_netbox_interface(self, iface):
         manufacturer = self.find_or_create_manufacturer(iface["vendor"])
+        serial = strip_longest_00_colon(iface["serial"])
         _ = nb.dcim.inventory_items.create(
             device=self.device_id,
             manufacturer=manufacturer.id,
@@ -166,6 +175,7 @@ class Inventory:
             tags=[{"name": INVENTORY_TAG["interface"]["name"]}],
             name="{}".format(iface["product"]),
             serial="{}".format(iface["serial"]),
+#            serial = "{}".format(serial),
             description="{} {}".format(iface["description"], iface["name"]),
         )
 
