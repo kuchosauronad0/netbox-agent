@@ -164,6 +164,12 @@ class ServerBase:
         """
         return self.system[0]["Serial Number"].strip()
 
+    def get_service_tag2(self):
+        """
+        Return the Service Tag from dmidecode info
+        """
+        return self.system[0]["Serial Number"].strip()
+
     def get_expansion_service_tag(self):
         """
         Return the virtual Service Tag from dmidecode info host
@@ -210,7 +216,7 @@ class ServerBase:
         device_type = get_device_type(self.get_chassis())
         device_role = get_device_role(config.device.chassis_role)
         serial = self.get_chassis_service_tag()
-        logging.info("Creating chassis blade (serial: {serial})".format(serial=serial))
+        logging.debug("Creating chassis blade (serial: {serial})".format(serial=serial))
         new_chassis = nb.dcim.devices.create(
             name=self.get_chassis_name(),
             device_type=device_type.id,
@@ -219,7 +225,8 @@ class ServerBase:
             site=datacenter.id if datacenter else None,
             tenant=tenant.id if tenant else None,
             rack=rack.id if rack else None,
-            position=position.id if position else None,
+            position=position if position else None,
+            face="front",
             tags=[{"name": x} for x in self.tags],
             custom_fields=self.custom_fields,
         )
@@ -305,7 +312,7 @@ class ServerBase:
             tenant=tenant.id if tenant else None,
             rack=rack.id if rack else None,
             position=position if position else None,
-            face=face if face else "front",
+            face="front",
             tags=[{"name": x} for x in self.tags],
         )
         return new_server
