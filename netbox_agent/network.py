@@ -201,6 +201,9 @@ class Network(object):
             if nic["ethtool"]["port"] in ("FIBRE", "Direct Attach Copper"):
                 return self.dcim_choices["interface:type"]["SFP (1GE)"]
             return self.dcim_choices["interface:type"]["1000BASE-T (1GE)"]
+        elif max_speed == "100000Mb/s":
+            return self.dcim_choices["interface:type"]["EDR (25 Gbps)"]
+
 
         return self.dcim_choices["interface:type"]["Other"]
 
